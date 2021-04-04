@@ -1,0 +1,12 @@
+production:
+    project_name: colourmap-generator
+    app_function: run.server
+    aws_region: us-east-1
+    s3_bucket: colourmap-generator-zappa
+    slim_handler: true
+    runtime: python3.7
+    keep_warm: false
+    timeout_seconds: 60
+    route53_enabled: false
+    certificate_arn: arn:aws:acm:us-east-1:136473752220:certificate/05874f36-87ea-4ea9-b3a1-569cc24b89bf
+    domain: colours.ellwise.com

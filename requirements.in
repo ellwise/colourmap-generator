@@ -1,5 +1,9 @@
 black
-colormath
 dash
 dash-bootstrap-components
+flake8
+numpy
+pandas
+plotly
+scikit-image
 zappa

@@ -1,15 +1,23 @@
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
+import numpy as np
 
 from app import SWATCH_SIZE, PICKER_SIZE
 
-msg_controls = html.P(
+
+msg = html.P(
     className="text-justify",
     children="""
-        Specify each colour within HSL-space.
-        These colours all transform to points within RGB-space, so we can be sure they can be represented in CSS.
-        Note that hue and lightness are not perfectly equivalent in HSL-space and LCH-space, but they are related.
+        To create good colourmaps for data visualisations, it's important to
+        consider the way colours are perceived. The lightness-chroma-hue
+        (LCH) colourspace is a good choice for doing so. Below, you can create
+        a swatch of colours by choosing values in LCH-space that map to valid
+        red-green-blue (RGB) colours. By valid, we mean that they are
+        commonly supported, e.g. within CSS. Typically, a colourmap should aim
+        to hold some LCH channels constant, and linearly transition through
+        others. For instance, the chroma and hue might be constant, and the
+        lightness linearly changing.
     """,
 )
 
@@ -33,20 +41,38 @@ hue_slider = html.Div(
         "marginLeft": "-25px",
         "marginRight": "-25px",
     },  # counter the slider's left/right padding
-    children=dcc.Slider(id="slider-hue", min=0, max=1, step=0.01, value=0.5),
+    children=dcc.Slider(
+        id="slider-hue",
+        min=0,
+        max=2 * np.pi,
+        step=np.pi / 180,
+        value=np.pi,
+        marks={
+            0: "0",
+            np.pi / 2: "90",
+            np.pi: "180",
+            3 * np.pi / 2: "270",
+            2 * np.pi: "360",
+        },
+    ),
 )
 hue_picker = dbc.FormGroup(
-    [hue_label, hue_progress, hue_slider, html.Div(style={"marginTop": "-30px"})]
+    [
+        hue_label,
+        hue_progress,
+        hue_slider,
+        html.Div(style={"marginTop": "-10px"}),
+    ]
 )
 
-saturation_label = dbc.Label("Saturation", html_for="bar-saturation")
-saturation_progress = dbc.Progress(
+chroma_label = dbc.Label("Chroma", html_for="bar-chroma")
+chroma_progress = dbc.Progress(
     className="mb-1",
-    id="bar-saturation",
+    id="bar-chroma",
     multi=True,
     children=[
         dbc.Progress(
-            id={"class": "bar-saturation", "index": j},
+            id={"class": "bar-chroma", "index": j},
             value=100 / PICKER_SIZE,
             bar=True,
             animated=False,
@@ -54,19 +80,26 @@ saturation_progress = dbc.Progress(
         for j in range(PICKER_SIZE)
     ],
 )
-saturation_slider = html.Div(
+chroma_slider = html.Div(
     style={
         "marginLeft": "-25px",
         "marginRight": "-25px",
     },  # counter the slider's left/right padding
-    children=dcc.Slider(id="slider-saturation", min=0, max=1, step=0.01, value=0.5),
+    children=dcc.Slider(
+        id="slider-chroma",
+        min=0,
+        max=136,
+        step=1,
+        value=68,
+        marks={j: f"{j}" for j in [0, 34, 68, 102, 136]},
+    ),
 )
-saturation_picker = dbc.FormGroup(
+chroma_picker = dbc.FormGroup(
     [
-        saturation_label,
-        saturation_progress,
-        saturation_slider,
-        html.Div(style={"marginTop": "-30px"}),
+        chroma_label,
+        chroma_progress,
+        chroma_slider,
+        html.Div(style={"marginTop": "-10px"}),
     ]
 )
 
@@ -90,48 +123,25 @@ lightness_slider = html.Div(
         "marginLeft": "-25px",
         "marginRight": "-25px",
     },  # counter the slider's left/right padding
-    children=dcc.Slider(id="slider-lightness", min=0, max=1, step=0.01, value=0.5),
+    children=dcc.Slider(
+        id="slider-lightness",
+        min=0,
+        max=100,
+        step=1,
+        value=50,
+        marks={j: f"{j}" for j in [0, 25, 50, 75, 100]},
+    ),
 )
 lightness_picker = dbc.FormGroup(
     [
         lightness_label,
         lightness_progress,
         lightness_slider,
-        html.Div(style={"marginTop": "-30px"}),
+        html.Div(style={"marginTop": "-10px"}),
     ]
 )
-pickers = html.Div([hue_picker, saturation_picker, lightness_picker])
 
 store = dcc.Store(id="store", data={j: None for j in range(SWATCH_SIZE)})
-
-msg_outputs = html.P(
-    className="text-justify",
-    children="""
-        The output color swatch is given as hex-codes for easy use in applications.
-        It is also plotted within LCH-space, to help with designing colour maps for data visualisation.
-        For instance, a linear colourmap could be designed with a constant chroma/hue, and linearly changing lightness.
-        It also could be designed with a constant lightness/hue, but linearly changing hue.
-    """,
-)
-
-kwargs = {
-    "className": "mb-1",
-    "style": {"height": "25vh"},
-    "config": {"staticPlot": True},
-}
-graph_l = dcc.Graph(id="graph-l", **kwargs)
-graph_c = dcc.Graph(id="graph-c", **kwargs)
-graph_h = dcc.Graph(id="graph-h", **kwargs)
-graphs = html.Div(
-    [
-        html.Div("Lightness"),
-        graph_l,
-        html.Div("Chroma"),
-        graph_c,
-        html.Div("Hue"),
-        graph_h,
-    ]
-)
 
 label_swatch = dbc.Label("Swatch", html_for="slider")
 progress_swatch_top = dbc.Progress(
@@ -142,7 +152,6 @@ progress_swatch_top = dbc.Progress(
             id={"class": "swatch-light", "index": j},
             value=100 / SWATCH_SIZE,
             bar=True,
-            animated=False,
         )
         for j in range(SWATCH_SIZE)
     ],
@@ -174,7 +183,7 @@ slider_swatch = html.Div(
         children=dcc.Slider(
             id="slider-swatch",
             min=0,
-            max=9,
+            max=8,
             step=1,
             value=0,
             marks={j: "" for j in range(10)},
@@ -192,7 +201,16 @@ swatch = dbc.FormGroup(
             style={
                 "marginTop": "-20px"
             },  # (partially) counter the slider's bottom padding
-            children="Select the active swatch element",
+            children="Use the slider above activate a swatch element",
         ),
     ]
 )
+
+kwargs = {
+    "className": "mb-1",
+    "style": {"height": "50vh"},
+    "config": {"staticPlot": True},
+}
+ch_plane = dcc.Graph(id="graph-ch", **kwargs)
+lh_plane = dcc.Graph(id="graph-lh", **kwargs)
+lc_plane = dcc.Graph(id="graph-lc", **kwargs)

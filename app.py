@@ -1,13 +1,16 @@
 import dash
 import dash_bootstrap_components as dbc
 
+
 SWATCH_SIZE = 9
 PICKER_SIZE = 20
 
-# some kwargs are needed for it to work with zappa - otherwise get js loading errors, DashRenderer not found, etc...
+# some kwargs are needed for it to work with zappa - otherwise get js loading
+# errors, DashRenderer not found, etc...
 zappa_kwargs = {
     "compress": False,
-    #'requests_pathname_prefix': '/production/', # this is needed if deployed without a domain mapping
+    # below is needed if deployed without a domain mapping
+    # 'requests_pathname_prefix': '/production/',
     "serve_locally": False,
 }
 
