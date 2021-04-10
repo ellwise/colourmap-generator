@@ -13,6 +13,9 @@ from components import (
 )
 
 
+col_kwargs = {"xs": 12, "sm": 12, "md": 12, "lg": 4, "xl": 4}
+
+
 def make_layout():
     return dbc.Container(
         className="mt-3 mb-3",
@@ -25,9 +28,18 @@ def make_layout():
                         swatch,
                         dbc.Row(
                             [
-                                dbc.Col([lightness_picker, ch_plane]),
-                                dbc.Col([chroma_picker, lh_plane]),
-                                dbc.Col([hue_picker, lc_plane]),
+                                dbc.Col(
+                                    children=[lightness_picker, ch_plane],
+                                    **col_kwargs
+                                ),
+                                dbc.Col(
+                                    children=[chroma_picker, lh_plane],
+                                    **col_kwargs
+                                ),
+                                dbc.Col(
+                                    children=[hue_picker, lc_plane],
+                                    **col_kwargs
+                                ),
                             ]
                         ),
                     ],
