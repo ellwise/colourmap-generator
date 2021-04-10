@@ -7,7 +7,7 @@ production:
     runtime: python3.7
     exclude:
         - venv
-    keep_warm: false
+    keep_warm: true
     timeout_seconds: 60
     route53_enabled: false
     certificate_arn: arn:aws:acm:us-east-1:136473752220:certificate/05874f36-87ea-4ea9-b3a1-569cc24b89bf
