@@ -1,6 +1,7 @@
 from dash.dependencies import Input, Output, State, MATCH, ALL
 import dash_html_components as html
 import plotly.express as px
+import plotly.graph_objects as go
 import numpy as np
 from utils import lch2lab, lab2rgb, rgb2lab, lab2lch
 
@@ -189,9 +190,10 @@ def update_bar_lightness(ids, hue, chroma, styles):
         Input("slider-lightness", "value"),
         Input("slider-chroma", "value"),
         Input("slider-hue", "value"),
+        Input("store", "data"),
     ],
 )
-def update_ch_plane(lightness, chroma, hue):
+def update_ch_plane(lightness, chroma, hue, data):
     cs = np.linspace(0, 136, num=137)
     hs = np.linspace(0, 2 * np.pi, num=361)
     lch = np.array([[[lightness, chroma, hue] for chroma in cs] for hue in hs])
@@ -206,8 +208,16 @@ def update_ch_plane(lightness, chroma, hue):
         aspect="auto",
         template="plotly_dark",
     )
-    fig.add_hline(y=hue * 180 / np.pi)
-    fig.add_vline(x=chroma)
+    trace = go.Scatter(
+        x=[v["lch"][1] if v else None for v in data.values()],
+        y=[v["lch"][2] * 180 / np.pi if v else None for v in data.values()],
+        mode="markers",
+        marker_color="black",
+        marker_line={"color": "white", "width": 1},
+    )
+    fig.add_trace(trace)
+    fig.add_hline(y=hue * 180 / np.pi, line_width=1, line_color="black")
+    fig.add_vline(x=chroma, line_width=1, line_color="black")
     fig.update_layout(margin=dict(t=0, b=0, l=0, r=0))
     return fig
 
@@ -218,9 +228,10 @@ def update_ch_plane(lightness, chroma, hue):
         Input("slider-lightness", "value"),
         Input("slider-chroma", "value"),
         Input("slider-hue", "value"),
+        Input("store", "data"),
     ],
 )
-def update_lh_plane(lightness, chroma, hue):
+def update_lh_plane(lightness, chroma, hue, data):
     chroma = chroma
     ls = np.linspace(0, 100, num=101)
     hs = np.linspace(0, 2 * np.pi, num=361)
@@ -238,8 +249,16 @@ def update_lh_plane(lightness, chroma, hue):
         aspect="auto",
         template="plotly_dark",
     )
-    fig.add_hline(y=hue * 180 / np.pi)
-    fig.add_vline(x=lightness)
+    trace = go.Scatter(
+        x=[v["lch"][0] if v else None for v in data.values()],
+        y=[v["lch"][2] * 180 / np.pi if v else None for v in data.values()],
+        mode="markers",
+        marker_color="black",
+        marker_line={"color": "white", "width": 1},
+    )
+    fig.add_trace(trace)
+    fig.add_hline(y=hue * 180 / np.pi, line_width=1, line_color="black")
+    fig.add_vline(x=lightness, line_width=1, line_color="black")
     fig.update_layout(margin=dict(t=0, b=0, l=0, r=0))
     return fig
 
@@ -250,9 +269,10 @@ def update_lh_plane(lightness, chroma, hue):
         Input("slider-lightness", "value"),
         Input("slider-chroma", "value"),
         Input("slider-hue", "value"),
+        Input("store", "data"),
     ],
 )
-def update_lc_plane(lightness, chroma, hue):
+def update_lc_plane(lightness, chroma, hue, data):
     ls = np.linspace(0, 100, num=101)
     cs = np.linspace(0, 136, num=137)
     lch = np.array(
@@ -269,7 +289,15 @@ def update_lc_plane(lightness, chroma, hue):
         # aspect="auto",
         template="plotly_dark",
     )
-    fig.add_hline(y=chroma)
-    fig.add_vline(x=lightness)
+    trace = go.Scatter(
+        x=[v["lch"][0] if v else None for v in data.values()],
+        y=[v["lch"][1] if v else None for v in data.values()],
+        mode="markers",
+        marker_color="black",
+        marker_line={"color": "white", "width": 1},
+    )
+    fig.add_trace(trace)
+    fig.add_hline(y=chroma, line_width=1, line_color="black")
+    fig.add_vline(x=lightness, line_width=1, line_color="black")
     fig.update_layout(margin=dict(t=0, b=0, l=0, r=0))
     return fig
