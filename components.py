@@ -29,7 +29,7 @@ hue_progress = dbc.Progress(
     children=[
         dbc.Progress(
             id={"class": "bar-hue", "index": j},
-            value=100 / PICKER_SIZE,
+            style={"width": f"{100 / PICKER_SIZE}%"},
             bar=True,
             animated=False,
         )
@@ -73,7 +73,7 @@ chroma_progress = dbc.Progress(
     children=[
         dbc.Progress(
             id={"class": "bar-chroma", "index": j},
-            value=100 / PICKER_SIZE,
+            style={"width": f"{100 / PICKER_SIZE}%"},
             bar=True,
             animated=False,
         )
@@ -111,7 +111,7 @@ lightness_progress = dbc.Progress(
     children=[
         dbc.Progress(
             id={"class": "bar-lightness", "index": j},
-            value=100 / PICKER_SIZE,
+            style={"width": f"{100 / PICKER_SIZE}%"},
             bar=True,
             animated=False,
         )
@@ -150,7 +150,7 @@ progress_swatch_top = dbc.Progress(
     children=[
         dbc.Progress(
             id={"class": "swatch-light", "index": j},
-            value=100 / SWATCH_SIZE,
+            style={"width": f"{100 / SWATCH_SIZE}%"},
             bar=True,
         )
         for j in range(SWATCH_SIZE)
@@ -162,7 +162,7 @@ progress_swatch_bottom = dbc.Progress(
     children=[
         dbc.Progress(
             id={"class": "swatch-dark", "index": j},
-            value=100 / SWATCH_SIZE,
+            style={"width": f"{100 / SWATCH_SIZE}%"},
             bar=True,
             animated=False,
             color="#808080",

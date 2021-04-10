@@ -76,89 +76,100 @@ def update_colour_picker(value, data, lightness, chroma, hue):
 
 @app.callback(
     [
-        Output({"class": "swatch-light", "index": MATCH}, "color"),
-        Output({"class": "swatch-dark", "index": MATCH}, "color"),
+        Output({"class": "swatch-light", "index": MATCH}, "style"),
+        Output({"class": "swatch-dark", "index": MATCH}, "style"),
         Output({"class": "swatch-light", "index": MATCH}, "children"),
         Output({"class": "swatch-dark", "index": MATCH}, "children"),
     ],
     Input("store", "data"),
-    State({"class": "swatch-light", "index": MATCH}, "id"),
+    [State({"class": "swatch-light", "index": MATCH}, "id"),
+    State({"class": "swatch-light", "index": MATCH}, "style"),
+    State({"class": "swatch-dark", "index": MATCH}, "style")],
 )
-def update_block_bg(data, id):
+def update_block_bg(data, id, style_light, style_dark):
     k = str(id["index"])
-    value = data[k]["hex"] if data[k] else None
+    colour = data[k]["hex"] if data[k] else None
 
-    label = value if value else ""
+    label = colour if colour else ""
     label_light = html.Div(label, style={"color": "white"})
     label_dark = html.Div(label, style={"color": "black"})
 
-    return value, value, label_light, label_dark
+    style_light["backgroundColor"] = colour
+    style_dark["backgroundColor"] = colour
+
+    return style_light, style_dark, label_light, label_dark
 
 
 @app.callback(
-    Output({"class": "bar-hue", "index": ALL}, "color"),
+    Output({"class": "bar-hue", "index": ALL}, "style"),
     [
         Input({"class": "bar-hue", "index": ALL}, "id"),
         Input("slider-chroma", "value"),
         Input("slider-lightness", "value"),
     ],
+    State({"class": "bar-hue", "index": ALL}, "style"),
 )
-def update_bar_hue(ids, chroma, lightness):
+def update_bar_hue(ids, chroma, lightness, styles):
     hues = [id["index"] * 2 * np.pi / (PICKER_SIZE - 1) for id in ids]
     lch = [[lightness, chroma, hue] for hue in hues]
     rgb = lch2rgb(lch)
     invalid = outside_gamut(lch)
     rgb[invalid] = None
-    return [
+    colours = [
         "#" + "".join(f"{int(j * 255):02x}" for j in colour)
         if not np.isnan(colour).any()
         else ""
         for colour in rgb
     ]
+    return [{**style, "backgroundColor": colour} for style, colour in zip(styles, colours)]
 
 
 @app.callback(
-    Output({"class": "bar-chroma", "index": ALL}, "color"),
+    Output({"class": "bar-chroma", "index": ALL}, "style"),
     [
         Input({"class": "bar-chroma", "index": ALL}, "id"),
         Input("slider-hue", "value"),
         Input("slider-lightness", "value"),
     ],
+    State({"class": "bar-chroma", "index": ALL}, "style"),
 )
-def update_bar_chroma(ids, hue, lightness):
+def update_bar_chroma(ids, hue, lightness, styles):
     chromas = [id["index"] * 136 / (PICKER_SIZE - 1) for id in ids]
     lch = [[lightness, chroma, hue] for chroma in chromas]
     rgb = lch2rgb(lch)
     invalid = outside_gamut(lch)
     rgb[invalid] = None
-    return [
+    colours = [
         "#" + "".join(f"{int(j * 255):02x}" for j in colour)
         if not np.isnan(colour).any()
         else ""
         for colour in rgb
     ]
+    return [{**style, "backgroundColor": colour} for style, colour in zip(styles, colours)]
 
 
 @app.callback(
-    Output({"class": "bar-lightness", "index": ALL}, "color"),
+    Output({"class": "bar-lightness", "index": ALL}, "style"),
     [
         Input({"class": "bar-lightness", "index": ALL}, "id"),
         Input("slider-hue", "value"),
         Input("slider-chroma", "value"),
     ],
+    State({"class": "bar-lightness", "index": ALL}, "style"),
 )
-def update_bar_lightness(ids, hue, chroma):
+def update_bar_lightness(ids, hue, chroma, styles):
     lightnesses = [id["index"] * 100 / (PICKER_SIZE - 1) for id in ids]
     lch = [[lightness, chroma, hue] for lightness in lightnesses]
     rgb = lch2rgb(lch)
     invalid = outside_gamut(lch)
     rgb[invalid] = None
-    return [
+    colours = [
         "#" + "".join(f"{int(j * 255):02x}" for j in colour)
         if not np.isnan(colour).any()
         else ""
         for colour in rgb
     ]
+    return [{**style, "backgroundColor": colour} for style, colour in zip(styles, colours)]
 
 
 @app.callback(
