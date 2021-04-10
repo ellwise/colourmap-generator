@@ -5,5 +5,4 @@ flake8
 numpy
 pandas
 plotly
-scikit-image
 zappa

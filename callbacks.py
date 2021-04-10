@@ -2,7 +2,7 @@ from dash.dependencies import Input, Output, State, MATCH, ALL
 import dash_html_components as html
 import plotly.express as px
 import numpy as np
-from skimage.color import lch2lab, lab2rgb, rgb2lab, lab2lch
+from utils import lch2lab, lab2rgb, rgb2lab, lab2lch
 
 from app import app, PICKER_SIZE
 
@@ -82,9 +82,11 @@ def update_colour_picker(value, data, lightness, chroma, hue):
         Output({"class": "swatch-dark", "index": MATCH}, "children"),
     ],
     Input("store", "data"),
-    [State({"class": "swatch-light", "index": MATCH}, "id"),
-    State({"class": "swatch-light", "index": MATCH}, "style"),
-    State({"class": "swatch-dark", "index": MATCH}, "style")],
+    [
+        State({"class": "swatch-light", "index": MATCH}, "id"),
+        State({"class": "swatch-light", "index": MATCH}, "style"),
+        State({"class": "swatch-dark", "index": MATCH}, "style"),
+    ],
 )
 def update_block_bg(data, id, style_light, style_dark):
     k = str(id["index"])
@@ -121,7 +123,10 @@ def update_bar_hue(ids, chroma, lightness, styles):
         else ""
         for colour in rgb
     ]
-    return [{**style, "backgroundColor": colour} for style, colour in zip(styles, colours)]
+    return [
+        {**style, "backgroundColor": colour}
+        for style, colour in zip(styles, colours)
+    ]
 
 
 @app.callback(
@@ -145,7 +150,10 @@ def update_bar_chroma(ids, hue, lightness, styles):
         else ""
         for colour in rgb
     ]
-    return [{**style, "backgroundColor": colour} for style, colour in zip(styles, colours)]
+    return [
+        {**style, "backgroundColor": colour}
+        for style, colour in zip(styles, colours)
+    ]
 
 
 @app.callback(
@@ -169,7 +177,10 @@ def update_bar_lightness(ids, hue, chroma, styles):
         else ""
         for colour in rgb
     ]
-    return [{**style, "backgroundColor": colour} for style, colour in zip(styles, colours)]
+    return [
+        {**style, "backgroundColor": colour}
+        for style, colour in zip(styles, colours)
+    ]
 
 
 @app.callback(

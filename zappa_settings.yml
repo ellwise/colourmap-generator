@@ -5,6 +5,8 @@ production:
     s3_bucket: colourmap-generator-zappa
     slim_handler: true
     runtime: python3.7
+    exclude:
+        - venv
     keep_warm: false
     timeout_seconds: 60
     route53_enabled: false
